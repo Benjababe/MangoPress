@@ -1,0 +1,73 @@
+<html>
+    
+    <head>
+        <link rel="icon" href="html/sakuraicon.png" type="image/x-icon"/>
+        <title>MangaPress</title>
+        <script src="js/socket.io.slim.js"></script>
+        <script src="js/index.js"></script>
+    </head>
+    
+    <body id="body">
+        <div class="top" style="width: 50%" align="center">
+            <input type="text" id="txtURL">
+            <input type="button" id="btnClear" value="Clear">
+            <input type="button" id="btnURL" value="Send URL">
+            <span class="savedHolder">
+                <span>Saved size: </span>
+                <span id="savedSize">0</span>
+                <span> MB</span>
+            </span>
+            <p id="txtStatus" style="margin-top: 20px;"></p>
+        </div>
+        <div class="header" align="center">
+            <img class="nav" src="html/double-left.png">
+            <img class="nav" src="html/double-right.png">
+        </div>
+        <div>
+            <img src="" alt="" id="imgMango" usemap="#imageMap">
+            <map name="imageMap">
+                <area shape="rect" coords="" id="clickPrev">
+                <area shape="rect" coords="" id="clickNext">
+            </map>
+        </div>
+        <div class="footer" align="center">
+            <img class="nav" src="html/double-left.png">
+            <img class="nav" src="html/double-right.png">
+        </div>
+    </body>
+    
+    <style>
+        .top, .header, .footer, #txtStatus, #imgMango {
+            user-select: none;
+            margin: 0;
+            position: relative;
+            left: 50%;
+            transform: translate(-50%, 0%);
+        }
+        
+        .savedHolder {
+            margin-left: 50px;
+        }
+        
+        .header {
+            margin-top: 30px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+        }
+        
+        .nav {
+            width: 40px;
+            height: 40px;
+        }
+        
+        #imgMango {
+            cursor: pointer;
+            margin-top: 40px;
+            max-width: 80%;
+        }
+    </style>
+    
+    
+</html>
