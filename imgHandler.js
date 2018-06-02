@@ -33,56 +33,59 @@ module.exports.download = (socket, url) => {
         let $ = cheerio.load(body),
             scriptData = $("script[data-type=chapter]").html(),
             JSONdata = JSON.parse(scriptData);
-        
+
         let images = JSONdata["page_array"],
             dataurl = JSONdata["dataurl"],
             chapterid = JSONdata["chapter_id"],
             dlCount = 0;
-        
+
         images.forEach((img) => {
             let imgURL = `https://mangadex.org/data/${dataurl}/${img}`,
-                imgDir = `./web/images/uncompressed/${chapterid}`;
-                path = `${imgDir}/${img}`;
-            
-            if (!fs.existsSync(imgDir))
-                fs.mkdirSync(imgDir);
-            
-            request(imgURL).pipe(fs.createWriteStream(path)).on("close", () => {
+                imgDir = `/web/images/uncompressed/${chapterid}/`;
+                path = `/${imgDir}/${img}`;
+
+            if (!fs.existsSync(__dirname + imgDir)) {
+                fs.mkdirSync(__dirname + imgDir, err => {});
+            }
+
+            request(imgURL).pipe(fs.createWriteStream(__dirname + path)).on("close", () => {
                 dlCount++;
-                if (dlCount == images.length)
+                if (dlCount == images.length) {
+                    Debug.log("Download completed");
                     compress(socket, imgDir, chapterid, images);
+                }
             });
         });
     });
 };
 
 let compress = (socket, path, chapterid, images) => {
-    let compressPath = `./web/images/compressed/${chapterid}`;
-    
-    imagemin([`${path}/*.jpg`], compressPath, {
+    let compressPath = `${__dirname}/web/images/compressed/${chapterid}`;
+
+    imagemin([`${__dirname}/${path}/*.jpg`], compressPath, {
         plugins: [ imageminJpegRecompress( { target: 0.1 } ) ]
     }).then(files => {
         if (files.length > 0) {
             getDifference(socket, path, chapterid);
             sendToSite(socket, chapterid, images);
         }
-    });
-    
-    imagemin([`${path}/*.png`], compressPath, {
-        plugins: [ imageminPngquant( { quality: "5" } ) ]
+    }).catch(eror => Debug.log(`JPEG: ${error}`));
+
+    imagemin([`${__dirname}/${path}/*.png`], compressPath, {
+        plugins: [  ]
     }).then(files => {
         if (files.length > 0) {
             getDifference(socket, path, chapterid);
             sendToSite(socket, chapterid, images);
         }
-    });
+    }).catch(error => Debug.log(`PNG ${error}`));
 };
 
 let getDifference = (socket, path, chapterid) => {
     folderSize(path, (err, size) => {
         if (err)    { throw err; }
         let uncSize = (size/1024/1024).toFixed(2);
-        folderSize(`./web/images/compressed/${chapterid}`, (err, size) => {
+        folderSize(`${__dirname}/web/images/compressed/${chapterid}`, (err, size) => {
             if (err)    { throw err; }
             let cSize = (size/1024/1024).toFixed(2);
             savedSize = (uncSize - cSize).toFixed(2);

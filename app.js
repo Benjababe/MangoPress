@@ -25,17 +25,19 @@ app.get("/", (req, res) => {
     res.sendFile("index.html", rootHTML);
 });
 
+Debug.log("Listening on port 8080")
+
 io.on("connection", (socket) => {
-    
+
     socket.on("url", (url) => {
         Debug.log(`URL received: ${url}`);
         socket.emit("received", "");
         imgHandler.download(socket, url);
     });
-    
+
     socket.on("disconnect", (reason) => {
         Debug.log(`Disconnected: ${reason}`);
         imgHandler.delete();
     })
-    
+
 });
