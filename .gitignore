@@ -61,5 +61,3 @@ typings/
 .next
 
 #ignore
-compression-libs
-node_modules
