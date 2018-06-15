@@ -16,8 +16,8 @@ window.onload = () => {
     });
     
     socket.on("savedsize", (savedSize) => {
-        let size = elid("savedSize").textContent;
-       savedSize.textContent = Number(size + savedSize);
+        console.log("received: " + savedSize);
+        elid("savedSize").textContent = Number(elid("savedSize").textContent) + Number(savedSize);
     });
     
     socket.on("mango", (data) => {

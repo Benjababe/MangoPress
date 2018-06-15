@@ -60,35 +60,37 @@ module.exports.download = (socket, url) => {
 };
 
 let compress = (socket, path, chapterid, images) => {
-    let compressPath = `${__dirname}/web/images/compressed/${chapterid}`;
+    let _path = __dirname + "/" + path,
+        compressPath = `${__dirname}/web/images/compressed/${chapterid}`;
 
     imagemin([`${__dirname}/${path}/*.jpg`], compressPath, {
         plugins: [ imageminJpegRecompress( { target: 0.1 } ) ]
     }).then(files => {
         if (files.length > 0) {
-            getDifference(socket, path, chapterid);
+            getDifference(socket, _path, compressPath, chapterid);
             sendToSite(socket, chapterid, images);
         }
     }).catch(eror => Debug.log(`JPEG: ${error}`));
 
     imagemin([`${__dirname}/${path}/*.png`], compressPath, {
-        plugins: [  ]
+        plugins: [ imageminPngquant( { speed: 3, quality: "80" } ) ]
     }).then(files => {
         if (files.length > 0) {
-            getDifference(socket, path, chapterid);
+            getDifference(socket, _path, compressPath, chapterid);
             sendToSite(socket, chapterid, images);
         }
     }).catch(error => Debug.log(`PNG ${error}`));
+        
 };
 
-let getDifference = (socket, path, chapterid) => {
+let getDifference = (socket, path, compressPath, chapterid) => {
     folderSize(path, (err, size) => {
         if (err)    { throw err; }
         let uncSize = (size/1024/1024).toFixed(2);
-        folderSize(`${__dirname}/web/images/compressed/${chapterid}`, (err, size) => {
+        folderSize(compressPath, (err, size) => {
             if (err)    { throw err; }
             let cSize = (size/1024/1024).toFixed(2);
-            savedSize = (uncSize - cSize).toFixed(2);
+            let savedSize = (uncSize - cSize).toFixed(2);
             socket.emit("savedsize", savedSize);
         });
     })
