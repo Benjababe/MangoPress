@@ -15,12 +15,25 @@
             <span class="savedHolder">
                 <span>Saved size: </span>
                 <span id="savedSize">0</span>
-                <span> MB</span>
+                <span> MB / </span>
+                <span id="totalSize">0</span>
+                <span> MB &nbsp; (</span>
+                <span id="percentageSize">0</span>
+                <span> % Saved )</span>
             </span>
             <p id="txtStatus" style="margin-top: 20px;"></p>
         </div>
         <div class="header" align="center">
             <img class="nav" src="html/double-left.png">
+            
+<!--
+            <span class="page-select-holder">
+                <select class="page-select">
+                    <option value="" disabled selected hidden>Select a page</option>
+                </select>
+            </span>
+-->
+            
             <img class="nav" src="html/double-right.png">
         </div>
         <div>
@@ -32,6 +45,15 @@
         </div>
         <div class="footer" align="center">
             <img class="nav" src="html/double-left.png">
+            
+<!--
+            <span class="page-select-holder">
+                <select class="page-select">
+                    <option value="" disabled selected hidden>Select a page</option>
+                </select>
+            </span>
+-->
+           
             <img class="nav" src="html/double-right.png">
         </div>
     </body>
@@ -61,6 +83,14 @@
             width: 40px;
             height: 40px;
         }
+        
+/*
+        .page-select-holder {
+            position: relative;
+            margin: 0 30 0 30;
+            bottom: 15px;
+        }
+*/
         
         #imgMango {
             cursor: pointer;

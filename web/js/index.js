@@ -7,6 +7,9 @@ window.onload = () => {
         return document.getElementById(id);
     }
     
+    const sel = document.getElementsByClassName("page-select");
+    
+    
     socket.on("connect", (data) => {
         console.log("Connected to socket.io");
     });
@@ -16,8 +19,10 @@ window.onload = () => {
     });
     
     socket.on("savedsize", (savedSize) => {
-        console.log("received: " + savedSize);
-        elid("savedSize").textContent = Number(elid("savedSize").textContent) + Number(savedSize);
+        elid("savedSize").textContent = Number(elid("savedSize").textContent) + Number(savedSize.split("_")[0]);
+        elid("totalSize").textContent = Number(elid("totalSize").textContent) + Number(savedSize.split("_")[1]);
+        elid("percentageSize").textContent = ((Number(elid("savedSize").textContent) /
+                                             Number(elid("totalSize").textContent)) * 100).toFixed(1);
     });
     
     socket.on("mango", (data) => {
@@ -27,22 +32,29 @@ window.onload = () => {
             images = data["images"];
         imgMango.src = `${defaultImgPath}/${chapterid}/${images[0]}`;
         
-        let i = 0;
+//        populateOptions(images.length);
         
+        let i = 0;
         let pageMove = (num) => {
-            i += num;
+            i = (num == "prev") ? --i : (num == "next") ? ++i : num;
             if (i >= images.length)
                 i--;
             else if (i < 0)
                 i = 0;
             else {
                 imgMango.src = `${defaultImgPath}/${chapterid}/${images[i]}`;
-                imgMango.scrollIntoView();
             }
         }
         
-        clickPrev.onclick = (x) => pageMove(-1);
-        clickNext.onclick = (x) => pageMove(1);
+        clickPrev.onclick = (x) => pageMove("prev");
+        clickNext.onclick = (x) => pageMove("next");
+        
+//        for (let k = 0; k < sel.length; k++) {
+//            sel[k].onchange = (e) => {
+//                let val = sel[k].options[sel[k].selectedIndex].value;
+//                pageMove(val - 1);
+//            }
+//        } 
         
     });
     
@@ -64,7 +76,23 @@ window.onload = () => {
             next = `${imgMango.width * 0.3}, 0, ${imgMango.width}, ${imgMango.height}`;
         clickPrev.coords = prev;
         clickNext.coords = next;
-    }    
+        
+        imgMango.scrollIntoView();
+    }   
+    
+//    let populateOptions = (pages) => {
+//        for (let i = 1; i <= pages; i++) {
+//            let opt1 = document.createElement("option"),
+//                opt2 = document.createElement("option"); 
+//            
+//            opt1.text = opt2.text = i;
+//            opt1.value = opt2.value = i;
+//            
+//            sel[0].add(opt1);
+//            sel[1].add(opt2);
+//        }
+//    }
+    
 };
 
 

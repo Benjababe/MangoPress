@@ -17,12 +17,13 @@ const imagemin = require("imagemin"),
       folderSize = require("get-folder-size");
 
 
-module.exports.delete = () => {
+module.exports.delete = (log = false) => {
     folderSize("./web/images", (err, size) => {
         if (err) { throw err; }
         let s = (size/1024/1024).toFixed(2);
         del(["./web/images/uncompressed/*", "./web/images/compressed/*"]).then((paths) => {
-            Debug.log(`Deleted ${paths.length} paths for ${s} MB`);
+            if (log)
+                Debug.log(`Deleted ${paths.length} paths for ${s} MB`);
         });
     });
 }
@@ -64,7 +65,7 @@ let compress = (socket, path, chapterid, images) => {
         compressPath = `${__dirname}/web/images/compressed/${chapterid}`;
 
     imagemin([`${__dirname}/${path}/*.jpg`], compressPath, {
-        plugins: [ imageminJpegRecompress( { target: 0.1 } ) ]
+        plugins: [ imageminJpegRecompress( { target: 0.5 } ) ]
     }).then(files => {
         if (files.length > 0) {
             getDifference(socket, _path, compressPath, chapterid);
@@ -73,7 +74,7 @@ let compress = (socket, path, chapterid, images) => {
     }).catch(eror => Debug.log(`JPEG: ${error}`));
 
     imagemin([`${__dirname}/${path}/*.png`], compressPath, {
-        plugins: [ imageminPngquant( { speed: 3, quality: "80" } ) ]
+        plugins: [ imageminPngquant( { speed: 3, quality: "85" } ) ]
     }).then(files => {
         if (files.length > 0) {
             getDifference(socket, _path, compressPath, chapterid);
@@ -91,7 +92,7 @@ let getDifference = (socket, path, compressPath, chapterid) => {
             if (err)    { throw err; }
             let cSize = (size/1024/1024).toFixed(2);
             let savedSize = (uncSize - cSize).toFixed(2);
-            socket.emit("savedsize", savedSize);
+            socket.emit("savedsize", savedSize + "_" + uncSize);
         });
     })
 }

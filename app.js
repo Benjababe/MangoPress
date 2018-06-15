@@ -28,6 +28,8 @@ app.get("/", (req, res) => {
 Debug.log("Listening on port 8080")
 
 io.on("connection", (socket) => {
+    
+    imgHandler.delete();
 
     socket.on("url", (url) => {
         Debug.log(`URL received: ${url}`);
@@ -37,7 +39,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", (reason) => {
         Debug.log(`Disconnected: ${reason}`);
-        imgHandler.delete();
+        imgHandler.delete(true);
     })
 
 });
