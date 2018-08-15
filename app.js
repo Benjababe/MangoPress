@@ -27,8 +27,7 @@ app.get("/", (req, res) => {
 
 Debug.log("Listening on port 8080")
 
-io.on("connection", (socket) => {
-    
+io.on("connection", (socket) => {    
     imgHandler.delete();
 
     socket.on("url", (url) => {
