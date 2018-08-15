@@ -16,7 +16,11 @@ const imagemin = require("imagemin"),
       imageminPngquant = require("imagemin-pngquant"),
       folderSize = require("get-folder-size");
 
+//Stuff
+const chapterURL = "https://mangadex.org/api/chapter/";
 
+
+//Delete all unconverted and converted images; log variable is for logging in console
 module.exports.delete = (log = false) => {
     folderSize("./web/images", (err, size) => {
         if (err) { throw err; }
@@ -30,36 +34,46 @@ module.exports.delete = (log = false) => {
 
 
 module.exports.download = (socket, url) => {
-    request(url, (err, res, body) => {
-        let $ = cheerio.load(body),
-            scriptData = $("script[data-type=chapter]").html(),
-            JSONdata = JSON.parse(scriptData);
-
-        let images = JSONdata["page_array"],
-            dataurl = JSONdata["dataurl"],
-            chapterid = JSONdata["chapter_id"],
-            dlCount = 0;
-
-        images.forEach((img) => {
-            let imgURL = `https://mangadex.org/data/${dataurl}/${img}`,
-                imgDir = `/web/images/uncompressed/${chapterid}/`;
-                path = `/${imgDir}/${img}`;
-
+    let temp = url.split("/"),
+        chapterid = temp[temp.indexOf("chapter") + 1],
+        apiURL = chapterURL + chapterid;
+    
+    let options = {
+        url: apiURL,
+        headers: {
+            "Cookie": "__cfduid=0; PHPSESSID=0; mangadex=0"
+        }
+    }
+    
+    request(options, (err, res, body) => {
+       let parsed = JSON.parse(body),
+           pageArray = parsed["page_array"],
+           hash = parsed["hash"],
+           dlCount = 0;
+        
+        console.log(body);
+        
+        pageArray.forEach((img) => {
+           let imgURL = `https://mangadex.org/data/${hash}/${img}`,
+               imgDir = `/web/images/uncompressed/${chapterid}`,
+               path = `${imgDir}/${img}`;
+            
             if (!fs.existsSync(__dirname + imgDir)) {
                 fs.mkdirSync(__dirname + imgDir, err => {});
             }
-
+            
             request(imgURL).pipe(fs.createWriteStream(__dirname + path)).on("close", () => {
                 dlCount++;
-                if (dlCount == images.length) {
+                if (dlCount == pageArray.length) {
                     Debug.log("Download completed");
-                    compress(socket, imgDir, chapterid, images);
+                    compress(socket, imgDir, chapterid, pageArray);
                 }
-            });
+            })
         });
     });
-};
+}
 
+//Compress downloaded Mangoes
 let compress = (socket, path, chapterid, images) => {
     let _path = __dirname + "/" + path,
         compressPath = `${__dirname}/web/images/compressed/${chapterid}`;
@@ -69,7 +83,7 @@ let compress = (socket, path, chapterid, images) => {
     }).then(files => {
         if (files.length > 0) {
             getDifference(socket, _path, compressPath, chapterid);
-            sendToSite(socket, chapterid, images);
+            sendData(socket, chapterid, images);
         }
     }).catch(eror => Debug.log(`JPEG: ${error}`));
 
@@ -78,12 +92,14 @@ let compress = (socket, path, chapterid, images) => {
     }).then(files => {
         if (files.length > 0) {
             getDifference(socket, _path, compressPath, chapterid);
-            sendToSite(socket, chapterid, images);
+            sendData(socket, chapterid, images);
         }
     }).catch(error => Debug.log(`PNG ${error}`));
         
 };
 
+
+//Get size difference between compressed and uncompressed
 let getDifference = (socket, path, compressPath, chapterid) => {
     folderSize(path, (err, size) => {
         if (err)    { throw err; }
@@ -94,10 +110,11 @@ let getDifference = (socket, path, compressPath, chapterid) => {
             let savedSize = (uncSize - cSize).toFixed(2);
             socket.emit("savedsize", savedSize + "_" + uncSize);
         });
-    })
+    });
 }
 
-let sendToSite = (socket, chapterid, images) => {
+//Sends compressed image data to client
+let sendData = (socket, chapterid, images) => {
     let data = {
         chapterid: chapterid,
         images: images
