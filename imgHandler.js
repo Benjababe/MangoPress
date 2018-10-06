@@ -51,8 +51,6 @@ module.exports.download = (socket, url) => {
            hash = parsed["hash"],
            dlCount = 0;
         
-        console.log(body);
-        
         pageArray.forEach((img) => {
            let imgURL = `https://mangadex.org/data/${hash}/${img}`,
                imgDir = `/web/images/uncompressed/${chapterid}`,
