@@ -12,7 +12,9 @@ const express = require("express"),
       app = express(),
       s = require("socket.io");
 
-let server = app.listen(8080);
+const port = 8080;
+
+let server = app.listen(port);
 let io = s(server);
 
 const rootHTML = {
@@ -25,7 +27,7 @@ app.get("/", (req, res) => {
     res.sendFile("index.html", rootHTML);
 });
 
-Debug.log("Listening on port 8080")
+Debug.log(`Listening on port ${port}`);
 
 io.on("connection", (socket) => {    
     imgHandler.delete();
