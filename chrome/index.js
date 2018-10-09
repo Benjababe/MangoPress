@@ -19,7 +19,7 @@ chrome.contextMenus.onClicked.addListener((e) => {
 });
 
 let parseURL = (url) => {
-	let regex = new RegExp("https:\/\/mangadex.org\/chapter\/[0-9]{1,10}/[0-9]{1,5}");
+	let regex = new RegExp("https:\/\/mangadex.org\/chapter\/[0-9]{1,10}/{0,1}[0-9]{0,3}");
 	let id = url.replace("https://mangadex.org/chapter/", "").replace("/", "_");
 	if (regex.test(url))
 		chrome.tabs.create( {
