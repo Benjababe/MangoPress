@@ -12,6 +12,9 @@ window.onload = () => {
     
     socket.on("connect", (data) => {
         console.log("Connected to socket.io");
+		if (window.location.search.indexOf("?id=") == 0) {
+			socket.emit("url", "https://mangadex.org/chapter/" + window.location.search.replace("?id=", ""));
+		}
     });
     
     socket.on("received", () => {
