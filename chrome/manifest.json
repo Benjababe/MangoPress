@@ -1,0 +1,13 @@
+{
+	"name": "Mango Assistant",
+	"version": "1.0.0",
+	"manifest_version": 2,
+	"description": "I help MangoPress",
+	"author": "Benjababe",
+	"background": {
+		"scripts": ["index.js"],
+		"persistent": false
+	},
+	"permissions": ["tabs",
+					"contextMenus"]
+}
