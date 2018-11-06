@@ -16,7 +16,7 @@
     "get-folder-size": "^2.0.0",
     "imagemin": "^6.0.0",
     "imagemin-jpeg-recompress": "^5.1.0",
-    "imagemin-mozjpeg": "^7.0.0",
+    "imagemin-mozjpeg": "^8.0.0",
     "imagemin-pngquant": "^6.0.0",
     "request": "^2.88.0",
     "socket.io": "^2.1.1"
