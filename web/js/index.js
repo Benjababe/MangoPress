@@ -1,6 +1,11 @@
 window.onload = () => {
-    
-    const socket = io.connect(`${location.hostname}:8080`),
+    if (location.protocol != "https:")
+        location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+
+    //TODO Only for http, https not implemented yet
+    const port = 443;
+
+    const socket = io.connect(`${location.hostname}:443`),
           defaultImgPath = "../images/compressed/";
     
     const elid = (id) => {
