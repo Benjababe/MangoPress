@@ -35,7 +35,7 @@ module.exports.delete = (log = false) => {
 
 module.exports.download = (socket, url) => {
     let temp = url.split("/"),
-        chapterid = temp[temp.indexOf("chapter") + 1],
+        chapterid = parseInt(temp[temp.indexOf("chapter") + 1]),
         apiURL = chapterURL + chapterid;
     
     let options = {
@@ -55,6 +55,10 @@ module.exports.download = (socket, url) => {
            let imgURL = `https://mangadex.org/data/${hash}/${img}`,
                imgDir = `/web/images/uncompressed/${chapterid}`,
                path = `${imgDir}/${img}`;
+
+            while (path.includes("//")) {
+                path = path.replace("//", "/");
+            }
             
             if (!fs.existsSync(__dirname + imgDir)) {
                 fs.mkdirSync(__dirname + imgDir, err => {});
@@ -74,9 +78,13 @@ module.exports.download = (socket, url) => {
 //Compress downloaded Mangoes
 let compress = (socket, path, chapterid, images) => {
     let _path = __dirname + "/" + path,
-        compressPath = `${__dirname}/web/images/compressed/${chapterid}`;
+        compressPath = `${__dirname}/web/images/compressed/${chapterid}`;;
 
-    imagemin([`${__dirname}/${path}/*.jpg`], compressPath, {
+    while (_path.includes("//")) {
+        _path = _path.replace("//", "/");
+    }
+
+    imagemin([`${_path}/*.jpg`], compressPath, {
         plugins: [ imageminJpegRecompress( { target: 0.5 } ) ]
     }).then(files => {
         if (files.length > 0) {
@@ -85,7 +93,7 @@ let compress = (socket, path, chapterid, images) => {
         }
     }).catch(eror => Debug.log(`JPEG: ${error}`));
 
-    imagemin([`${__dirname}/${path}/*.png`], compressPath, {
+    imagemin([`${_path}/*.png`], compressPath, {
         plugins: [ imageminPngquant( { speed: 3, quality: "85" } ) ]
     }).then(files => {
         if (files.length > 0) {
