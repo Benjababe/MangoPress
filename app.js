@@ -31,7 +31,7 @@ const httpPort = 80,
 let httpServer = http.createServer(app),
     httpsServer = https.createServer(credentials, app);
 
-httpServer.listen(httpPost);
+httpServer.listen(httpPort);
 httpsServer.listen(httpsPort);
 
 let io = s(httpsServer);
