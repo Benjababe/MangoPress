@@ -15,7 +15,7 @@ window.onload = () => {
 
     const sel = document.getElementsByClassName("page-select");
 
-    let preload = false,
+    let preload = elid("chkPreload"),
         chapterid = "",
         images = null,
         page = 0;
@@ -93,7 +93,7 @@ window.onload = () => {
 
     function updateImage(page) {
         imgMango.src = `${defaultImgPath}/${chapterid}/${images[page]}`
-        if (preload) {
+        if (preload.checked) {
             preload1.src = `${defaultImgPath}/${chapterid}/${images[movePage(1)]}`;
             preload2.src = `${defaultImgPath}/${chapterid}/${images[movePage(1)]}`;
         }
