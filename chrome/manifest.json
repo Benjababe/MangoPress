@@ -5,8 +5,10 @@
 	"description": "I help MangoPress",
 	"author": "Benjababe",
 	"background": {
-		"scripts": ["index.js"],
-		"persistent": false
+		"scripts": ["index.js"]
+	},
+	"icons": {
+		"16": "sakuraicon16x16.png"
 	},
 	"permissions": ["tabs",
 					"contextMenus"]

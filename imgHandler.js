@@ -37,20 +37,20 @@ module.exports.download = (socket, url) => {
     let temp = url.split("/"),
         chapterid = parseInt(temp[temp.indexOf("chapter") + 1]),
         apiURL = chapterURL + chapterid;
-    
+
     let options = {
         url: apiURL,
         headers: {
             "Cookie": "__cfduid=0; PHPSESSID=0; mangadex=0"
         }
     }
-    
+
     request(options, (err, res, body) => {
        let parsed = JSON.parse(body),
            pageArray = parsed["page_array"],
            hash = parsed["hash"],
            dlCount = 0;
-        
+
         pageArray.forEach((img) => {
            let imgURL = `https://mangadex.org/data/${hash}/${img}`,
                imgDir = `/web/images/uncompressed/${chapterid}`,
@@ -59,11 +59,11 @@ module.exports.download = (socket, url) => {
             while (path.includes("//")) {
                 path = path.replace("//", "/");
             }
-            
+
             if (!fs.existsSync(__dirname + imgDir)) {
                 fs.mkdirSync(__dirname + imgDir, err => {});
             }
-            
+
             request(imgURL).pipe(fs.createWriteStream(__dirname + path)).on("close", () => {
                 dlCount++;
                 if (dlCount == pageArray.length) {
@@ -91,7 +91,7 @@ let compress = (socket, path, chapterid, images) => {
             getDifference(socket, _path, compressPath, chapterid);
             sendData(socket, chapterid, images);
         }
-    }).catch(eror => Debug.log(`JPEG: ${error}`));
+    }).catch(error => socket.emit("error", `JPG: ${error}`));
 
     imagemin([`${_path}/*.png`], compressPath, {
         plugins: [ imageminPngquant( { speed: 3, quality: "85" } ) ]
@@ -100,8 +100,8 @@ let compress = (socket, path, chapterid, images) => {
             getDifference(socket, _path, compressPath, chapterid);
             sendData(socket, chapterid, images);
         }
-    }).catch(error => Debug.log(`PNG ${error}`));
-        
+    }).catch(error => socket.emit("error", `PNG: ${error}`));
+
 };
 
 

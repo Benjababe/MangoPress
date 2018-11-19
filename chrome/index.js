@@ -1,29 +1,24 @@
-const MangaPressURL = "http://ec2-52-15-61-230.us-east-2.compute.amazonaws.com:8080"
+const MangaPressURL = "https://benja.press";
 
 const prop = {
 	"id": "mangoHelper",
 	"title": "Open in MangoPress",
-	"visible": true,
-	"contexts": ["link", "image", "page"]
-}
+	"contexts": ["link", "image"]
+};
 
 chrome.contextMenus.create(prop);
 
 chrome.contextMenus.onClicked.addListener((e) => {
-	if (e.menuItemId == "mangoHelper") {
-		if (e.linkUrl)
-			parseURL(e.linkUrl);
-		else 
-			parseURL(e.pageUrl);
+	if (e.menuItemId == prop.id) {
+		console.dir(e);
+		let url = (e.linkUrl == null) ? e.pageUrl : e.linkUrl ,
+			regex = new RegExp("https:\/\/mangadex.org/chapter/[0-9]{0,10}[/]{0,1}[0-9]{0,10}");
+		if (regex.test(url)) {
+			let path = url.replace("https://mangadex.org/chapter/", "").replace("/", "_");
+			chrome.tabs.create({
+				"url": MangaPressURL + "?id=" + path,
+				"active": true
+			});
+		};
 	}
 });
-
-let parseURL = (url) => {
-	let regex = new RegExp("https:\/\/mangadex.org\/chapter\/[0-9]{1,10}/{0,1}[0-9]{0,3}");
-	let id = url.replace("https://mangadex.org/chapter/", "").replace("/", "_");
-	if (regex.test(url))
-		chrome.tabs.create( {
-			"url": MangaPressURL + "?id=" + id 
-		} );
-}
-
