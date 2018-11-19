@@ -1,17 +1,18 @@
 <html>
-    
+
     <head>
         <link rel="icon" href="html/sakuraicon.png" type="image/x-icon"/>
         <title>MangaPress</title>
         <script src="js/socket.io.slim.js"></script>
         <script src="js/index.js"></script>
     </head>
-    
+
     <body id="body">
         <div class="top" style="width: 50%" align="center">
             <input type="text" id="txtURL">
             <input type="button" id="btnClear" value="Clear">
             <input type="button" id="btnURL" value="Send URL">
+            <input type="checkbox" id="chkPreload" checked>
             <span class="savedHolder">
                 <span>Saved size: </span>
                 <span id="savedSize">0</span>
@@ -25,7 +26,10 @@
         </div>
         <div class="header" align="center">
             <img class="nav" src="html/double-left.png">
-            
+
+        <img id="preload1" hidden>
+        <img id="preload2" hidden>
+
 <!--
             <span class="page-select-holder">
                 <select class="page-select">
@@ -33,7 +37,7 @@
                 </select>
             </span>
 -->
-            
+
             <img class="nav" src="html/double-right.png">
         </div>
         <div>
@@ -45,7 +49,7 @@
         </div>
         <div class="footer" align="center">
             <img class="nav" src="html/double-left.png">
-            
+
 <!--
             <span class="page-select-holder">
                 <select class="page-select">
@@ -53,11 +57,11 @@
                 </select>
             </span>
 -->
-           
+
             <img class="nav" src="html/double-right.png">
         </div>
     </body>
-    
+
     <style>
         .top, .header, .footer, #txtStatus, #imgMango {
             user-select: none;
@@ -66,24 +70,24 @@
             left: 50%;
             transform: translate(-50%, 0%);
         }
-        
+
         .savedHolder {
             margin-left: 50px;
         }
-        
+
         .header {
             margin-top: 30px;
         }
-        
+
         .footer {
             margin-top: 40px;
         }
-        
+
         .nav {
             width: 40px;
             height: 40px;
         }
-        
+
 /*
         .page-select-holder {
             position: relative;
@@ -91,13 +95,13 @@
             bottom: 15px;
         }
 */
-        
+
         #imgMango {
             cursor: pointer;
             margin-top: 40px;
             max-width: 80%;
         }
     </style>
-    
-    
+
+
 </html>

@@ -15,6 +15,11 @@ window.onload = () => {
 
     const sel = document.getElementsByClassName("page-select");
 
+    let preload = false,
+        chapterid = "",
+        images = null,
+        page = 0;
+
 
     socket.on("connect", (data) => {
         console.log("Connected to socket.io");
@@ -41,22 +46,16 @@ window.onload = () => {
     socket.on("mango", (data) => {
         txtStatus.textContent = "";
         data = JSON.parse(data);
-        let chapterid = data["chapterid"],
-            images = data["images"];
+        chapterid = data["chapterid"],
+        images = data["images"],
+        page = 0;
         imgMango.src = `${defaultImgPath}/${chapterid}/${images[0]}`;
 
 //        populateOptions(images.length);
 
-        let i = 0;
         let pageMove = (num) => {
-            i = (num == "prev") ? --i : (num == "next") ? ++i : num;
-            if (i >= images.length)
-                i--;
-            else if (i < 0)
-                i = 0;
-            else {
-                imgMango.src = `${defaultImgPath}/${chapterid}/${images[i]}`;
-            }
+            let s = (num == "prev") ? -1 : (num == "next") ? 1 : 0;
+            updateImage(movePage(step));
         }
 
         clickPrev.onclick = (x) => pageMove("prev");
@@ -89,8 +88,24 @@ window.onload = () => {
             next = `${imgMango.width * 0.3}, 0, ${imgMango.width}, ${imgMango.height}`;
         clickPrev.coords = prev;
         clickNext.coords = next;
-
         imgMango.scrollIntoView();
+    }
+
+    function updateImage(page) {
+        imgMango.src = `${defaultImgPath}/${chapterid}/${images[page]}`
+        if (preload) {
+            preload1.src = `${defaultImgPath}/${chapterid}/${images[movePage(1)]}`;
+            preload2.src = `${defaultImgPath}/${chapterid}/${images[movePage(1)]}`;
+        }
+    }
+
+    function movePage(step) {
+        let max = images.length - 1,
+            min = 0
+        page += step;
+        if (page < min)     page = 0;
+        if (page >= max)    page = max;
+        return page;
     }
 
 //    let populateOptions = (pages) => {
