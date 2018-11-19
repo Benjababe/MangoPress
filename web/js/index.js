@@ -54,7 +54,7 @@ window.onload = () => {
 //        populateOptions(images.length);
 
         let pageMove = (num) => {
-            let s = (num == "prev") ? -1 : (num == "next") ? 1 : 0;
+            let step = (num == "prev") ? -1 : (num == "next") ? 1 : 0;
             updateImage(movePage(step));
         }
 
