@@ -25,13 +25,14 @@ const pKey = fs.readFileSync("/etc/letsencrypt/live/benja.press/privkey.pem", "u
           ca: ca
       };
 
-const port = 80;
+const httpPort = 80,
+      httpsPort = 443
 
 let httpServer = http.createServer(app),
     httpsServer = https.createServer(credentials, app);
 
-httpServer.listen(80);
-httpsServer.listen(443);
+httpServer.listen(httpPost);
+httpsServer.listen(httpsPort);
 
 let io = s(httpsServer);
 
@@ -54,7 +55,7 @@ app.get("/*", (req, res, next) => {
         next();
 });
 
-Debug.log(`Listening on port ${port}`);
+Debug.log(`Listening on port ${httpPort} and ${httpsPort}`);
 
 io.on("connection", (socket) => {
     imgHandler.delete();
