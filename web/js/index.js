@@ -1,3 +1,4 @@
+
 if (location.protocol != "https:")
     location.href = "https:" + window.location.href.substring(window.location.protocol.length);
 
@@ -69,6 +70,8 @@ window.onload = () => {
 //        }
 
     });
+
+    console.log("hi");
 
     txtURL.onkeypress = (e) => {
         if (e.key === "Enter")
