@@ -71,7 +71,7 @@ window.onload = () => {
 
     });
 
-    console.log("hi");
+    settings.height = txtUrl.height;
 
     txtURL.onkeypress = (e) => {
         if (e.key === "Enter")
