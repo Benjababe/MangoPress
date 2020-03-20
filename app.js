@@ -40,6 +40,13 @@ const rootHTML = {
     root: __dirname + "/web/html/"
 }
 
+//Create image folders
+if (!fs.existsSync("./web/images/") || 
+    !fs.existsSync("./web/images/compressed") || !fs.existsSync("./web/images/uncompressed")) {
+    fs.mkdirSync("./web/images/compressed/")
+    fs.mkdirSync("./web/images/uncompressed/")
+}
+
 app.use(express.static("web"));
 
 app.use(express.static(__dirname, {dotfiles:"allow"}));
@@ -60,10 +67,11 @@ Debug.log(`Listening on port ${httpPort} and ${httpsPort}`);
 io.on("connection", (socket) => {
     imgHandler.delete();
 
-    socket.on("url", (url) => {
-        Debug.log(`URL received: ${url}`);
+    socket.on("url", (info) => {
+        info = JSON.parse(info)
+        Debug.log(`URL received: ${info.url}`);
         socket.emit("received", "");
-        imgHandler.download(socket, url);
+        imgHandler.download(socket, info);
     });
 
     socket.on("disconnect", (reason) => {

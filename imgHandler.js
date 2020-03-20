@@ -7,18 +7,14 @@ class Debug {
 //Web Libraries
 const request = require("request"),
       fs = require("fs"),
-      cheerio = require("cheerio"),
       del = require("del");
 
-//Image libraries
-const imagemin = require("imagemin"),
-      imageminJpegRecompress = require("imagemin-jpeg-recompress"),
-      imageminPngquant = require("imagemin-pngquant"),
+//Conversion handling
+const compressImages = require("compress-images"),
       folderSize = require("get-folder-size");
 
 //Stuff
-const chapterURL = "https://mangadex.org/api/chapter/";
-
+const chapterAPIURL = "https://mangadex.org/api/chapter/";
 
 //Delete all unconverted and converted images; log variable is for logging in console
 module.exports.delete = (log = false) => {
@@ -32,11 +28,11 @@ module.exports.delete = (log = false) => {
     });
 }
 
-
-module.exports.download = (socket, url) => {
-    let temp = url.split("/"),
+module.exports.download = (socket, info) => {
+    let url = info.url,
+        temp = url.split("/"),
         chapterid = parseInt(temp[temp.indexOf("chapter") + 1]),
-        apiURL = chapterURL + chapterid;
+        apiURL = chapterAPIURL + chapterid;
 
     let options = {
         url: apiURL,
@@ -50,7 +46,8 @@ module.exports.download = (socket, url) => {
            pageArray = parsed["page_array"],
            hash = parsed["hash"],
            dlCount = 0;
-
+        //if (!fs.existsSync(`./web/images/uncompressed/${chapterid}`))
+        //    fs.mkdirSync(`./web/images/uncompressed/${chapterid}`);
         pageArray.forEach((img) => {
            let imgURL = `https://mangadex.org/data/${hash}/${img}`,
                imgDir = `/web/images/uncompressed/${chapterid}`,
@@ -67,8 +64,8 @@ module.exports.download = (socket, url) => {
             request(imgURL).pipe(fs.createWriteStream(__dirname + path)).on("close", () => {
                 dlCount++;
                 if (dlCount == pageArray.length) {
-                    Debug.log("Download completed");
-                    compress(socket, imgDir, chapterid, pageArray);
+                    Debug.log(`Download completed for ID:${chapterid}`);
+                    compress(socket, imgDir, chapterid, pageArray, jpegQual = info.jpegQual, pngQual = info.pngQual);
                 }
             })
         });
@@ -76,41 +73,36 @@ module.exports.download = (socket, url) => {
 }
 
 //Compress downloaded Mangoes
-let compress = (socket, path, chapterid, images) => {
-    let _path = __dirname + "/" + path,
-        compressPath = `${__dirname}/web/images/compressed/${chapterid}`;;
+let compress = (socket, path, chapterid, images, jpegQual = "40", pngQual = 5) => {
+    let inputPath = "./" + path,
+        outputPath = `./web/images/compressed/${chapterid}/`;
+    inputPath = inputPath.split("//").join("/");
+    if (!fs.existsSync(outputPath))
+        fs.mkdirSync(outputPath);
+    let inputFiles = inputPath + "/*.{jpg,JPG,jpeg,JPEG,png,svg,gif}";
 
-    while (_path.includes("//")) {
-        _path = _path.replace("//", "/");
-    }
-
-    imagemin([`${_path}/*.jpg`], compressPath, {
-        plugins: [ imageminJpegRecompress( { target: 0.5 } ) ]
-    }).then(files => {
-        if (files.length > 0) {
-            getDifference(socket, _path, compressPath, chapterid);
-            sendData(socket, chapterid, images);
+    compressImages(inputFiles, outputPath, {compress_force: true, statistic: false, autoupdate: true}, false,
+        {jpg: {engine: 'mozjpeg', command: ['-quality', jpegQual]}},
+        {png: {engine: 'pngquant', command: ['--quality=' + pngQual]}},
+        {svg: {engine: 'svgo'}},
+        {gif: {engine: 'gifsicle'}}, function(error, completed){
+            if (error)
+                Debug.log(`Error: ${error}`);
+            if (completed) {
+                Debug.log(`Conversion completed for ID:${chapterid}...`);
+                getDifference(socket, inputPath, outputPath);
+                sendData(socket, chapterid, images);
+            }
         }
-    }).catch(error => socket.emit("error", `JPG: ${error}`));
-
-    imagemin([`${_path}/*.png`], compressPath, {
-        plugins: [ imageminPngquant( { speed: 3, quality: "85" } ) ]
-    }).then(files => {
-        if (files.length > 0) {
-            getDifference(socket, _path, compressPath, chapterid);
-            sendData(socket, chapterid, images);
-        }
-    }).catch(error => socket.emit("error", `PNG: ${error}`));
-
+    );
 };
 
-
 //Get size difference between compressed and uncompressed
-let getDifference = (socket, path, compressPath, chapterid) => {
-    folderSize(path, (err, size) => {
+let getDifference = (socket, inputPath, outputPath) => {
+    folderSize(inputPath, (err, size) => {
         if (err)    { throw err; }
         let uncSize = (size/1024/1024).toFixed(2);
-        folderSize(compressPath, (err, size) => {
+        folderSize(outputPath, (err, size) => {
             if (err)    { throw err; }
             let cSize = (size/1024/1024).toFixed(2);
             let savedSize = (uncSize - cSize).toFixed(2);

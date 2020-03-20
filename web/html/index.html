@@ -8,12 +8,13 @@
     </head>
 
     <body id="body">
-        <div class="top" style="width: 50%" align="center">
+        <div class="top" style="width: 50%;">
             <input type="text" id="txtURL">
             <input type="button" id="btnClear" value="Clear">
             <input type="button" id="btnURL" value="Send URL">
-            <img id="settings" src="html/settings.png"/>
+            <img id="settings" style="cursor:pointer;" src="html/settings.png"/>
             <input type="checkbox" id="chkPreload" checked>
+            <label for="chkPreload">Preload images</label>
             <span class="savedHolder">
                 <span>Saved size: </span>
                 <span id="savedSize">0</span>
@@ -23,23 +24,23 @@
                 <span id="percentageSize">0</span>
                 <span> % Saved )</span>
             </span>
-            <p id="txtStatus" style="margin-top: 20px;"></p>
+            <div class="spacer"></div>
+            <p id="txtStatus" style="margin-top:20px;"></p>
         </div>
-        <div class="header" align="center">
-            <img class="nav" src="html/double-left.png">
+        <div class="spacer"></div>
+        <div class="header">
+            <img class="nav l-end" src="html/double-left.png">
 
         <img id="preload1" hidden>
         <img id="preload2" hidden>
 
-<!--
-            <span class="page-select-holder">
-                <select class="page-select">
-                    <option value="" disabled selected hidden>Select a page</option>
-                </select>
-            </span>
--->
+        <span class="page-select-holder">
+            <select class="page-select">
+                <option value="" disabled selected hidden>Select a page</option>
+            </select>
+        </span>
 
-            <img class="nav" src="html/double-right.png">
+            <img class="nav r-end" src="html/double-right.png">
         </div>
         <div>
             <img src="" alt="" id="imgMango" usemap="#imageMap">
@@ -48,40 +49,86 @@
                 <area shape="rect" coords="" id="clickNext">
             </map>
         </div>
-        <div class="footer" align="center">
-            <img class="nav" src="html/double-left.png">
+        <div class="footer">
+            <img class="nav l-end" src="html/double-left.png">
 
-<!--
-            <span class="page-select-holder">
-                <select class="page-select">
-                    <option value="" disabled selected hidden>Select a page</option>
-                </select>
-            </span>
--->
+        <span class="page-select-holder">
+            <select class="page-select">
+                <option value="" disabled selected hidden>Select a page</option>
+            </select>
+        </span>
 
-            <img class="nav" src="html/double-right.png">
+            <img class="nav r-end" src="html/double-right.png">
         </div>
     </body>
 
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-box" id="settingsBox">
+            <table id="tbQuality">
+            <tr><th><span>JPEG Quality: </span></th><th><input type="text" id="txtJPGQ" value="40"></th></tr>
+            <tr><th><span>PNG Quality: </span></th><th><input type="text" id="txtPNGQ" value="5"></th></tr>
+            </table>
+            <input type="button" id="btnQuality" style="margin-top: 10px;" value="Save">
+        </div>
+    </div>
+
     <style>
+        /* TOTALLY NOT STOLEN FROM W3SCH */
+        .settings-overlay {
+            user-select: none;
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.3); /* Black w/ opacity */
+        }
+
+        .settings-box {
+            background-color: white;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 20%; /* Could be more or less, depending on screen size */
+            animation-name: animatefade;
+            animation-duration: 0.4s;
+        }
+
+        @keyframes animatefade {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        #btnQuality, #tbQuality {
+            position: relative;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
+
         .top, .header, .footer, #txtStatus, #imgMango {
             user-select: none;
             margin: 0;
             position: relative;
             left: 50%;
             transform: translate(-50%, 0%);
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .header, .footer {
+            margin-top: 35px
+        }
+
+        img {
+            cursor: pointer;
         }
 
         .savedHolder {
             margin-left: 50px;
-        }
-
-        .header {
-            margin-top: 30px;
-        }
-
-        .footer {
-            margin-top: 40px;
         }
 
         .nav {
@@ -93,16 +140,13 @@
             transform: translateY(15%);
         }
 
-/*
         .page-select-holder {
             position: relative;
             margin: 0 30 0 30;
             bottom: 15px;
         }
-*/
 
         #imgMango {
-            cursor: pointer;
             margin-top: 40px;
             max-width: 80%;
         }
